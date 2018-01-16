@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/colorPrimaryDark">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dp">
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="15:00"
+            android:textSize="10pt"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:id="@+id/est_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="15:00"
+            android:textSize="10pt"
+            android:textColor="#FFFF00"
+            android:layout_marginLeft="4dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:id="@+id/train"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            tools:text="T"
+            android:textSize="10pt"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:id="@+id/track"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            tools:text="10"
+            android:textSize="10pt"
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/destination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        tools:text="HELSINKI"
+        android:textSize="10pt"
+        android:textColor="#FFFFFF"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"/>
+</RelativeLayout>

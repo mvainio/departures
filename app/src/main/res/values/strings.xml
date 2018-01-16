@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Departures</string>
+    <string name="departures">Departures</string>
+    <string name="stations">Stations</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_departure">Departures</string>
+    <string name="ok">Ok</string>
+    <string name="permission_request_rationale">Permission to location is needed to sort the station list in proximity order.</string>
+</resources>
