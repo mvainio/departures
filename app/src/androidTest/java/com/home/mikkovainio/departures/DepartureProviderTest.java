@@ -42,7 +42,7 @@ public class DepartureProviderTest extends ProviderTestCase2<DeparturesProvider>
     public void testDepartureDataQuery() {
         Cursor c = mockResolver.query(DeparturesContract.DEPARTURES_URI, null,null, new String[] {"KE"}, null);
         assertEquals(6, c.getColumnCount());
-        assertEquals(10, c.getCount());
+        assertEquals(20, c.getCount());
     }
 
 

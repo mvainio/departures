@@ -24,7 +24,7 @@ public class DigiTrafficDepartureStationTest {
         List<DepartureStation> list = parser.parseStations(oneStationData);
         assertEquals(1, list.size());
         assertEquals("KE", list.get(0).getId());
-        assertEquals("Kerava asema", list.get(0).getStationName());
+        assertEquals("Kerava", list.get(0).getStationName());
     }
 
     @Test

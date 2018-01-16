@@ -85,6 +85,9 @@ public class DeparturesProvider extends ContentProvider {
                 }
                 return createStationCursor(stationData);
             case DEPARTURES_DATA:
+                if (stationCache == null) {
+                    fillStationCache();
+                }
                 List<DepartureData> departureData = departureDataParser.parseDepartureData(downloader.DownloadData(makeDepartureDataUrl(selectionArgs)), selectionArgs[0]);
                 Collections.sort(departureData, new Comparator<DepartureData>() {
                     @Override
