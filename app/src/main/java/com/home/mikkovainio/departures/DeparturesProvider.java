@@ -74,20 +74,18 @@ public class DeparturesProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
         int match = URIMatcher.match(uri);
 
+        if (stationCache == null) {
+            fillStationCache();
+        }
+
         switch (match) {
             case STATIONS_DATA:
-                if (stationCache == null) {
-                    fillStationCache();
-                }
                 List<DepartureStation> stationData = new ArrayList<>(stationCache.values());
                 if (DeparturesContract.STATION_SORT_BY_LOCATION.equals(sortOrder)) {
                     sortStationsByLocation(selectionArgs, stationData);
                 }
                 return createStationCursor(stationData);
             case DEPARTURES_DATA:
-                if (stationCache == null) {
-                    fillStationCache();
-                }
                 List<DepartureData> departureData = departureDataParser.parseDepartureData(downloader.DownloadData(makeDepartureDataUrl(selectionArgs)), selectionArgs[0]);
                 Collections.sort(departureData, new Comparator<DepartureData>() {
                     @Override

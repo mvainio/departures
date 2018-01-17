@@ -17,22 +17,26 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    ListView stations;
-    SimpleCursorAdapter adapter;
-    LocationManager locationManager;
-    SwipeRefreshLayout swipeRefreshLayout;
+    private ListView stations;
+    private SimpleCursorAdapter adapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private Location lastKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +45,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle(R.string.stations);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.stations_swipe_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getSupportLoaderManager().restartLoader(0, null, MainActivity.this);
+                refreshLocationAndLoadStations(true);
             }
         });
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         stations = (ListView) findViewById(R.id.list_view);
         adapter = new SimpleCursorAdapter(getBaseContext(), R.layout.stations_list, null, new String[] { DeparturesContract.StationColumns.STATION_NAME }, new int[] {R.id.station_name}, 0);
@@ -77,7 +81,38 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
             }).show();
         } else {
-            getSupportLoaderManager().initLoader(0, null, this);
+            refreshLocationAndLoadStations(false);
+
+        }
+    }
+
+    private boolean locationAvailable() {
+        return ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @SuppressLint("MissingPermission")
+    private void refreshLocationAndLoadStations(final boolean restartLoader) {
+        if (locationAvailable()) {
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        lastKnownLocation = location;
+                    }
+                    loadStations(MainActivity.this, restartLoader);
+                }
+            });
+        } else {
+            loadStations(MainActivity.this, restartLoader);
+        }
+    }
+
+    private void loadStations(LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks, boolean restartLoader) {
+        if (restartLoader) {
+            getSupportLoaderManager().restartLoader(0, null, loaderCallbacks);
+        } else {
+            getSupportLoaderManager().initLoader(0, null, loaderCallbacks);
         }
     }
 
@@ -86,27 +121,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (requestCode != 1) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        getSupportLoaderManager().initLoader(0, null, this);
+        refreshLocationAndLoadStations(false);
     }
-
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         String sortOrder = null;
         String[] selectionArgs = null;
-        if (locationAvailable()) {
+        if (lastKnownLocation != null) {
             sortOrder = DeparturesContract.STATION_SORT_BY_LOCATION;
-            @SuppressLint("MissingPermission") Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             selectionArgs = new String[] {String.valueOf(lastKnownLocation.getLatitude()), String.valueOf(lastKnownLocation.getLongitude())};
         }
         return new CursorLoader(this, DeparturesContract.STATIONS_URI, null, null, selectionArgs, sortOrder);
-    }
-
-    private boolean locationAvailable() {
-        return ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
     @Override
